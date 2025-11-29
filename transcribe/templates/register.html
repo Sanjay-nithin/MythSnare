@@ -1,0 +1,545 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Mythsnare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .register-card {
+        max-width: 550px;
+        width: 100%;
+        padding: 3rem;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .register-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        letter-spacing: -1px;
+    }
+
+    .register-header p {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .register-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group-text {
+        background: rgba(10, 10, 10, 0.8);
+        border: 1px solid var(--border-color);
+        border-right: none;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group:focus-within .input-group-text {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.7);
+        z-index: 10;
+    }
+
+    .input-wrapper {
+        position: relative;
+        flex: 1;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .strength-meter {
+        height: 5px;
+        background: var(--border-color);
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 0.25rem;
+    }
+
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .strength-weak { 
+        width: 33%; 
+        background: var(--danger-color); 
+    }
+
+    .strength-medium { 
+        width: 66%; 
+        background: var(--warning-color); 
+    }
+
+    .strength-strong { 
+        width: 100%; 
+        background: var(--success-color); 
+    }
+
+    .password-match {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+
+    .password-match.show {
+        display: block;
+    }
+
+    .password-match.match {
+        color: var(--success-color);
+    }
+
+    .password-match.no-match {
+        color: var(--danger-color);
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        color: #000000;
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-register:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-register:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.5rem 0;
+        color: var(--light-text);
+        opacity: 0.6;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .divider span {
+        padding: 0 1rem;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--light-text);
+    }
+
+    .login-link a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .login-link a:hover {
+        color: rgba(255, 255, 255, 1);
+        text-decoration: underline;
+    }
+
+    .requirements {
+        background: rgba(255, 255, 255, 0.03);
+        border-left: 3px solid rgba(255, 255, 255, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .requirements h6 {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .requirements ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .requirements li {
+        font-size: 0.85rem;
+        color: var(--light-text);
+        opacity: 0.8;
+        padding: 0.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .requirements li i {
+        font-size: 0.7rem;
+    }
+
+    .requirements li.valid i {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .requirements li.invalid i {
+        color: rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container register-container">
+    <div class="card register-card">
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join Mythsnare to start fact-checking</p>
+        </div>
+
+        <form method="POST" action="{% url 'register' %}" id="registerForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Choose a username" 
+                        required
+                        autocomplete="username"
+                        minlength="3"
+                    >
+                </div>
+                <small class="text-muted">Username must be at least 3 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Create a strong password" 
+                            required
+                            autocomplete="new-password"
+                            minlength="6"
+                        >
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                    </div>
+                </div>
+                <div class="password-strength">
+                    <small id="strengthText">Password strength: <span id="strengthLabel">-</span></small>
+                    <div class="strength-meter">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">
+                    <i class="fas fa-lock"></i> Confirm Password
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            placeholder="Confirm your password" 
+                            required
+                            autocomplete="new-password"
+                        >
+                        <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                    </div>
+                </div>
+                <div class="password-match" id="passwordMatch">
+                    <i class="fas fa-check-circle"></i> Passwords match
+                </div>
+            </div>
+
+            <div class="requirements">
+                <h6><i class="fas fa-info-circle"></i> Password Requirements:</h6>
+                <ul id="requirementsList">
+                    <li id="req-length" class="invalid">
+                        <i class="fas fa-circle"></i> At least 6 characters
+                    </li>
+                    <li id="req-number" class="invalid">
+                        <i class="fas fa-circle"></i> Contains a number
+                    </li>
+                    <li id="req-letter" class="invalid">
+                        <i class="fas fa-circle"></i> Contains a letter
+                    </li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn btn-register" id="registerBtn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'login' %}">
+                <i class="fas fa-sign-in-alt"></i> Login Here
+            </a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 6) strength++;
+        if (password.length >= 10) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+        return strength;
+    }
+
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthLabel = document.getElementById('strengthLabel');
+
+        // Update requirements
+        const reqLength = document.getElementById('req-length');
+        const reqNumber = document.getElementById('req-number');
+        const reqLetter = document.getElementById('req-letter');
+
+        if (password.length >= 6) {
+            reqLength.classList.remove('invalid');
+            reqLength.classList.add('valid');
+            reqLength.querySelector('i').className = 'fas fa-check-circle';
+        } else {
+            reqLength.classList.remove('valid');
+            reqLength.classList.add('invalid');
+            reqLength.querySelector('i').className = 'fas fa-circle';
+        }
+
+        if (/\d/.test(password)) {
+            reqNumber.classList.remove('invalid');
+            reqNumber.classList.add('valid');
+            reqNumber.querySelector('i').className = 'fas fa-check-circle';
+        } else {
+            reqNumber.classList.remove('valid');
+            reqNumber.classList.add('invalid');
+            reqNumber.querySelector('i').className = 'fas fa-circle';
+        }
+
+        if (/[a-zA-Z]/.test(password)) {
+            reqLetter.classList.remove('invalid');
+            reqLetter.classList.add('valid');
+            reqLetter.querySelector('i').className = 'fas fa-check-circle';
+        } else {
+            reqLetter.classList.remove('valid');
+            reqLetter.classList.add('invalid');
+            reqLetter.querySelector('i').className = 'fas fa-circle';
+        }
+
+        // Update strength meter
+        strengthFill.className = 'strength-fill';
+        if (strength <= 2) {
+            strengthFill.classList.add('strength-weak');
+            strengthLabel.textContent = 'Weak';
+            strengthLabel.style.color = 'var(--danger-color)';
+        } else if (strength <= 4) {
+            strengthFill.classList.add('strength-medium');
+            strengthLabel.textContent = 'Medium';
+            strengthLabel.style.color = 'var(--warning-color)';
+        } else {
+            strengthFill.classList.add('strength-strong');
+            strengthLabel.textContent = 'Strong';
+            strengthLabel.style.color = 'var(--success-color)';
+        }
+
+        checkPasswordMatch();
+    });
+
+    // Password match checker
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        const passwordMatch = document.getElementById('passwordMatch');
+
+        if (confirmPassword.length > 0) {
+            passwordMatch.classList.add('show');
+            if (password === confirmPassword) {
+                passwordMatch.classList.remove('no-match');
+                passwordMatch.classList.add('match');
+                passwordMatch.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+            } else {
+                passwordMatch.classList.remove('match');
+                passwordMatch.classList.add('no-match');
+                passwordMatch.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+            }
+        } else {
+            passwordMatch.classList.remove('show');
+        }
+    }
+
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+    // Form validation
+    const registerForm = document.getElementById('registerForm');
+    
+    registerForm.addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (!username || !password || !confirmPassword) {
+            e.preventDefault();
+            alert('Please fill in all fields');
+            return false;
+        }
+
+        if (username.length < 3) {
+            e.preventDefault();
+            alert('Username must be at least 3 characters long');
+            return false;
+        }
+
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('Password must be at least 6 characters long');
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match');
+            return false;
+        }
+
+        // Check if password meets requirements
+        if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
+            e.preventDefault();
+            alert('Password must contain at least one letter and one number');
+            return false;
+        }
+    });
+
+    // Auto-focus on username field
+    document.getElementById('username').focus();
+</script>
+{% endblock %}

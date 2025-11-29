@@ -1,0 +1,826 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Mythsnare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        padding: 2.5rem 0 1.5rem;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 1.5rem;
+        font-weight: 400;
+    }
+
+    .chatbot-container {
+        max-width: 900px;
+        margin: 0 auto 2rem;
+        background: var(--dark-card);
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 180px);
+        position: relative;
+    }
+
+    .chatbot-header {
+        background: rgba(10, 10, 10, 0.95);
+        padding: 0.75rem 1.25rem;
+        color: white;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .chatbot-header h3 {
+        margin: 0;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .chatbot-header h3 i {
+        font-size: 0.9rem;
+    }
+
+    .chatbot-header small {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        font-weight: 400;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background: #000000;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 50px,
+                rgba(255, 255, 255, 0.02) 50px,
+                rgba(255, 255, 255, 0.02) 51px
+            );
+    }
+
+    .message {
+        margin-bottom: 1.25rem;
+        display: flex;
+        gap: 0.75rem;
+        animation: slideIn 0.3s ease-out;
+        align-items: flex-start;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message.user {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        border: 1px solid var(--border-color);
+    }
+
+    .message.user .message-avatar {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+    }
+
+    .message.bot .message-avatar {
+        background: rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+    }
+
+    .message-content {
+        flex: 1;
+        max-width: calc(100% - 50px);
+        padding: 0.7rem 1rem;
+        border-radius: 8px;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .message.user .message-content {
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .message.bot .message-content {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .result-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 500;
+        margin-bottom: 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .result-badge.true {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+
+    .result-badge.false {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--danger-color);
+        border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .confidence-bar {
+        margin-top: 0.6rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+
+    .chat-input-area {
+        padding: 1rem 1.25rem;
+        background: var(--dark-card);
+        border-top: 1px solid var(--border-color);
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+    }
+
+    .input-controls {
+        display: flex;
+        gap: 0.6rem;
+        align-items: flex-end;
+    }
+
+    .input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    #messageInput {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        background: rgba(10, 10, 10, 0.95);
+        border: 1px solid var(--border-color);
+        color: var(--light-text);
+        resize: none;
+        min-height: 44px;
+        max-height: 120px;
+        font-size: 0.9rem;
+    }
+
+    #messageInput:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+
+    .control-buttons {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .icon-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+    }
+
+    .icon-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .icon-btn.mic.recording {
+        animation: pulse 1.5s infinite;
+        background: rgba(248, 113, 113, 0.1);
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .file-input-group {
+        display: none;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    /* File Type Modal */
+    .file-type-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        z-index: 1000;
+        min-width: 300px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .file-type-modal.active {
+        display: block;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+    }
+
+    .modal-overlay.active {
+        display: block;
+    }
+
+    .file-type-modal h4 {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .file-type-option {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .file-type-option:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+    }
+
+    .file-type-option i {
+        font-size: 1.1rem;
+    }
+
+    .loading-dots {
+        display: inline-block;
+    }
+
+    .loading-dots span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.7);
+        margin: 0 2px;
+        animation: loading 1.4s infinite ease-in-out both;
+    }
+
+    .loading-dots span:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .loading-dots span:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes loading {
+        0%, 80%, 100% {
+            transform: scale(0);
+            opacity: 0.5;
+        }
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .welcome-message {
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .welcome-message i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .welcome-message h4 {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-message p {
+        font-size: 0.85rem;
+    }
+
+    .welcome-message ul {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .features-section {
+        padding: 2.5rem 0;
+    }
+
+    .feature-card {
+        text-align: center;
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .feature-card h4 {
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+        color: var(--light-text);
+    }
+
+    .feature-card p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero-section fade-in">
+        <h1 class="hero-title">Mythsnare</h1>
+        <p class="hero-subtitle">Verify claims, check news, and detect misinformation with AI</p>
+    </div>
+
+    <!-- Chatbot Interface -->
+    <div class="chatbot-container fade-in">
+        <div class="chatbot-header">
+            <div>
+                <h3>
+                    <i class="fas fa-robot"></i>
+                    Fact Checker
+                </h3>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Welcome to Mythsnare</h4>
+                <p>Send any claim, news, or statement to verify its authenticity.</p>
+                <ul style="list-style: none; padding: 0; display: inline-block; text-align: left;">
+                    <li><i class="fas fa-keyboard"></i> Type your question</li>
+                    <li><i class="fas fa-microphone"></i> Record voice</li>
+                    <li><i class="fas fa-file-upload"></i> Upload audio/video/document</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="file" id="fileInput" accept="*/*">
+            
+            <div class="input-controls">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="form-control" 
+                        placeholder="Type your message here..."
+                        rows="1"
+                    ></textarea>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="icon-btn upload" id="uploadBtn" title="Upload file">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="icon-btn mic" id="micBtn" title="Record voice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="icon-btn send" id="sendBtn" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Type Selection Modal -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="file-type-modal" id="fileTypeModal">
+        <h4><i class="fas fa-file-upload"></i> Select File Type</h4>
+        <div class="file-type-option" data-type="audio" data-accept="audio/*,.mp3,.wav,.m4a,.aac">
+            <i class="fas fa-music"></i>
+            <span>Audio File</span>
+        </div>
+        <div class="file-type-option" data-type="video" data-accept="video/*,.mp4,.avi,.mov,.mkv">
+            <i class="fas fa-video"></i>
+            <span>Video File</span>
+        </div>
+        <div class="file-type-option" data-type="document" data-accept=".pdf,.doc,.docx,.txt">
+            <i class="fas fa-file-alt"></i>
+            <span>Document</span>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features-section">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>AI-Powered Analysis</h4>
+                    <p>Advanced BERT & LLaMA models for accurate fact verification</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <h4>Real-Time News Check</h4>
+                    <p>Cross-reference with multiple news sources and Wikipedia</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h4>Multi-Input Support</h4>
+                    <p>Text, voice, audio, video, and document analysis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const micBtn = document.getElementById('micBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const fileTypeModal = document.getElementById('fileTypeModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const fileTypeOptions = document.querySelectorAll('.file-type-option');
+
+    let isRecording = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let selectedFileType = 'audio';
+
+    // Add message to chat
+    function addMessage(content, isUser = false, isLoading = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        
+        if (isLoading) {
+            messageContent.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Analyzing...';
+        } else {
+            messageContent.innerHTML = content;
+        }
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+        
+        // Remove welcome message if exists
+        const welcomeMsg = chatMessages.querySelector('.welcome-message');
+        if (welcomeMsg) {
+            welcomeMsg.remove();
+        }
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        return messageDiv;
+    }
+
+    // Send text message
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, true);
+        messageInput.value = '';
+
+        const loadingMsg = addMessage('', false, true);
+
+        try {
+            const response = await fetch('/classify-text/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            loadingMsg.remove();
+
+            if (data.error) {
+                addMessage(`<i class="fas fa-exclamation-triangle"></i> Error: ${data.error}`, false);
+            } else {
+                const resultHtml = formatResult(data);
+                addMessage(resultHtml, false);
+            }
+        } catch (error) {
+            loadingMsg.remove();
+            addMessage(`<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`, false);
+        }
+    }
+
+    // Format result with styling
+    function formatResult(data) {
+        // Check if it's a "no news found" case
+        if (data.message && !data.explanation) {
+            return `
+                <div class="result-badge false">
+                    <i class="fas fa-info-circle"></i> NO DATA
+                </div>
+                <p><strong>Category:</strong> ${data.prediction}</p>
+                <p style="color: rgba(255, 255, 255, 0.8);">
+                    <i class="fas fa-exclamation-triangle"></i> ${data.message}
+                </p>
+                ${data.retries_attempted ? `<p style="margin-top: 0.5rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6);"><i class="fas fa-redo"></i> Retried ${data.retries_attempted} times</p>` : ''}
+            `;
+        }
+        
+        const isTrueClass = data.is_true ? 'true' : 'false';
+        const isTrueText = data.is_true ? 'TRUE' : 'FALSE';
+        const isTrueIcon = data.is_true ? 'fa-check-circle' : 'fa-times-circle';
+        
+        let html = `
+            <div class="result-badge ${isTrueClass}">
+                <i class="fas ${isTrueIcon}"></i> ${isTrueText}
+            </div>
+            <p><strong>Category:</strong> ${data.prediction}</p>
+            <p>${data.explanation}</p>
+        `;
+        
+        if (data.confidence !== null && data.confidence !== undefined) {
+            html += `
+                <div style="margin-top: 1rem;">
+                    <small><strong>Confidence:</strong> ${data.confidence}%</small>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${data.confidence}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return html;
+    }
+
+    // Handle voice recording
+    async function toggleRecording() {
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    await uploadAudioFile(audioBlob, 'recording.wav');
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                micBtn.classList.add('recording');
+                micBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                addMessage('<i class="fas fa-microphone"></i> Recording...', true);
+            } catch (error) {
+                alert('Microphone access denied or not available.');
+            }
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+    }
+
+    // Upload audio file
+    async function uploadAudioFile(blob, filename) {
+        const formData = new FormData();
+        formData.append('audio_file', blob, filename);
+
+        const loadingMsg = addMessage('', false, true);
+
+        try {
+            const response = await fetch('/detect/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            loadingMsg.remove();
+
+            if (data.error) {
+                addMessage(`<i class="fas fa-exclamation-triangle"></i> Error: ${data.error}`, false);
+            } else if (data.transcription) {
+                // Show transcription
+                addMessage(`<i class="fas fa-file-audio"></i> <strong>Transcription:</strong> ${data.transcription}`, false);
+                
+                // Automatically analyze the transcription
+                const analyzeResponse = await fetch('/classify-text/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ message: data.transcription })
+                });
+
+                const analyzeData = await analyzeResponse.json();
+                const resultHtml = formatResult(analyzeData);
+                addMessage(resultHtml, false);
+            }
+        } catch (error) {
+            loadingMsg.remove();
+            addMessage(`<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`, false);
+        }
+    }
+
+    // Handle file upload
+    function handleFileUpload() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const fileType = fileTypeSelect.value;
+        addMessage(`<i class="fas fa-file-upload"></i> Uploading ${fileType}: ${file.name}`, true);
+
+        uploadAudioFile(file, file.name);
+        fileInput.value = '';
+    }
+
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Modal functions
+    function openFileTypeModal() {
+        fileTypeModal.classList.add('active');
+        modalOverlay.classList.add('active');
+    }
+
+    function closeFileTypeModal() {
+        fileTypeModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+    }
+
+    // File type selection
+    fileTypeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            selectedFileType = option.dataset.type;
+            fileInput.accept = option.dataset.accept;
+            closeFileTypeModal();
+            fileInput.click();
+        });
+    });
+
+    // Close modal when clicking overlay
+    modalOverlay.addEventListener('click', closeFileTypeModal);
+
+    // Event listeners
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    micBtn.addEventListener('click', toggleRecording);
+    uploadBtn.addEventListener('click', openFileTypeModal);
+    fileInput.addEventListener('change', handleFileUpload);
+</script>
+{% endblock %}

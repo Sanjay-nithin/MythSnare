@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About - Mythsnare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-section {
+        padding: 3rem 0;
+    }
+
+    .about-hero {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .about-hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+        letter-spacing: -1px;
+    }
+
+    .about-card {
+        margin-bottom: 2rem;
+        padding: 2.5rem;
+    }
+
+    .about-card h3 {
+        color: rgba(255, 255, 255, 0.95);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .about-card h3 i {
+        font-size: 2rem;
+    }
+
+    .about-card p, .about-card ul {
+        color: var(--light-text);
+        line-height: 1.8;
+        opacity: 0.9;
+    }
+
+    .about-card ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .about-card ul li {
+        padding: 0.5rem 0;
+        padding-left: 2rem;
+        position: relative;
+    }
+
+    .about-card ul li::before {
+        content: '\f00c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .tech-stack {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .tech-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .tech-item i {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 1rem;
+    }
+
+    .tech-item h5 {
+        color: var(--light-text);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .tech-item p {
+        color: var(--light-text);
+        opacity: 0.7;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .how-it-works {
+        margin-top: 3rem;
+    }
+
+    .step-card {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: var(--dark-card);
+        border-radius: 15px;
+        border-left: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .step-number {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .step-content h4 {
+        color: var(--light-text);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+
+    .step-content p {
+        color: var(--light-text);
+        opacity: 0.8;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .stats-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        margin: 3rem 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .stat-item h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-item p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container about-section">
+    <div class="about-hero fade-in">
+        <h1><i class="fas fa-shield-alt"></i> About Mythsnare</h1>
+        <p class="lead">Fighting misinformation with cutting-edge AI technology</p>
+    </div>
+
+    <!-- Mission Card -->
+    <div class="card about-card fade-in">
+        <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+        <p>
+            Mythsnare is an advanced AI-powered fact-checking system designed to combat misinformation 
+            and help users distinguish between factual information and false claims. In an era where 
+            misinformation spreads rapidly across digital platforms, we provide a reliable, intelligent 
+            solution to verify claims and news in real-time.
+        </p>
+        <p>
+            Our mission is to empower individuals, organizations, and communities with the tools they 
+            need to make informed decisions based on accurate information, thereby contributing to a 
+            more trustworthy and transparent information ecosystem.
+        </p>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works fade-in">
+        <h2 class="text-center mb-4" style="color: var(--primary-color);">
+            <i class="fas fa-cogs"></i> How It Works
+        </h2>
+        
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Input Your Query</h4>
+                <p>
+                    Enter your claim, statement, or question through text, voice recording, or by 
+                    uploading audio/video/document files. Our system accepts multiple input formats 
+                    for maximum flexibility.
+                </p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>AI Classification</h4>
+                <p>
+                    Our BERT-based machine learning model analyzes your input to determine whether 
+                    it's a factual claim or news-related content. This classification helps us apply 
+                    the most appropriate verification strategy.
+                </p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Multi-Source Verification</h4>
+                <p>
+                    For news content, we extract key entities and cross-reference with real-time news 
+                    sources from Google News RSS feeds and Wikipedia. For factual claims, we leverage 
+                    our LLaMA AI model for deep analysis.
+                </p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Intelligent Analysis</h4>
+                <p>
+                    Our LLaMA 3.1 model processes all gathered information, applies critical reasoning, 
+                    and provides a confident assessment with detailed explanation and confidence score.
+                </p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h4>Receive Results</h4>
+                <p>
+                    Get a clear verdict (True/False), confidence percentage, and comprehensive 
+                    explanation. Our results are presented in an easy-to-understand format with 
+                    visual indicators for quick comprehension.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="card about-card fade-in">
+        <h3><i class="fas fa-microchip"></i> Technology Stack</h3>
+        <p>
+            Mythsnare leverages state-of-the-art AI models and modern web technologies to deliver 
+            accurate and reliable fact-checking capabilities:
+        </p>
+        
+        <div class="tech-stack">
+            <div class="tech-item">
+                <i class="fas fa-brain"></i>
+                <h5>BERT Model</h5>
+                <p>Text classification & analysis</p>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-robot"></i>
+                <h5>LLaMA 3.1</h5>
+                <p>Advanced fact verification</p>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-python"></i>
+                <h5>Python & Django</h5>
+                <p>Backend framework</p>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-microphone-alt"></i>
+                <h5>Whisper AI</h5>
+                <p>Speech-to-text transcription</p>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-language"></i>
+                <h5>spaCy NLP</h5>
+                <p>Entity extraction</p>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-newspaper"></i>
+                <h5>News APIs</h5>
+                <p>Real-time news verification</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="card about-card fade-in">
+        <h3><i class="fas fa-star"></i> Key Features</h3>
+        <ul>
+            <li>Real-time fact-checking with AI-powered analysis</li>
+            <li>Multi-format input support (text, voice, audio, video, documents)</li>
+            <li>Cross-referencing with multiple authoritative sources</li>
+            <li>Named Entity Recognition for precise context understanding</li>
+            <li>Confidence scoring for transparency</li>
+            <li>Multi-language support through Whisper AI</li>
+            <li>Intuitive chatbot interface for easy interaction</li>
+            <li>Fast processing with comprehensive explanations</li>
+            <li>Wikipedia integration for additional context</li>
+            <li>Secure user authentication and session management</li>
+        </ul>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section fade-in">
+        <h2 style="color: white; margin-bottom: 1rem;">Why Choose Mythsnare?</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2><i class="fas fa-bolt"></i></h2>
+                <p>Lightning Fast Analysis</p>
+            </div>
+            <div class="stat-item">
+                <h2><i class="fas fa-check-double"></i></h2>
+                <p>Multi-Source Verification</p>
+            </div>
+            <div class="stat-item">
+                <h2><i class="fas fa-shield-alt"></i></h2>
+                <p>High Accuracy AI Models</p>
+            </div>
+            <div class="stat-item">
+                <h2><i class="fas fa-users"></i></h2>
+                <p>User-Friendly Interface</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="card about-card text-center fade-in">
+        <h3><i class="fas fa-rocket"></i> Get Started Today</h3>
+        <p>Join the fight against misinformation. Start fact-checking with Mythsnare now!</p>
+        <div class="mt-3">
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-play-circle"></i> Try Fact Checker
+            </a>
+            <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg ms-3">
+                <i class="fas fa-envelope"></i> Contact Us
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
